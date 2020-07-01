@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
         JsonPlaceHolderApi = retrofit.create(JsonPlaceHolderApi.class);
 
         //getPosts();
-        getComments();
+        //getComments();
+        createPost();
     }
 
     private void getPosts() {
@@ -82,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<List<Comment>> call, Response<List<Comment>> response) {
                 if (!response.isSuccessful()) {
                     textViewResult.setText("Code: " + response.code());
-                    textViewResult.setText("Code: " + response.code());
                     return;
                 }
 
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 for (Comment comment : comments) {
                     String content = "";
                     content += "ID: " + comment.getId() + "\n";
-                    content += "Post ID: " + comment.getId() + "\n";
+                    content += "Post ID: " + comment.getPostId() + "\n";
                     content += "Name: " + comment.getName() + "\n";
                     content += "Email: " + comment.getEmail() + "\n";
                     content += "Text: " + comment.getBody() + "\n\n";
@@ -101,6 +101,39 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Comment>> call, Throwable t) {
+                textViewResult.setText(t.getMessage());
+            }
+        });
+    }
+
+    private void createPost() {
+        Post post = new Post(23, "New Title", "New Text");
+        Map<String, String> fields = new HashMap<>();
+        fields.put("userId", "25");
+        fields.put("title", "New Title");
+        Call<Post> call = JsonPlaceHolderApi.createPost(fields);
+        call.enqueue(new Callback<Post>() {
+            @Override
+            public void onResponse(Call<Post> call, Response<Post> response) {
+                if (!response.isSuccessful()) {
+                    textViewResult.setText("Code: " + response.code());
+                    return;
+                }
+
+                Post postResponse = response.body();
+                String content = "";
+                content += "Code: " + response.code() + "\n";
+                content += "ID: " + postResponse.getId() + "\n";
+                content += "User ID: " + postResponse.getUserId() + "\n";
+                content += "Title: " + postResponse.getTitle() + "\n";
+                content += "Text: " + postResponse.getText() + "\n\n";
+
+                textViewResult.setText(content);
+
+            }
+
+            @Override
+            public void onFailure(Call<Post> call, Throwable t) {
                 textViewResult.setText(t.getMessage());
             }
         });
